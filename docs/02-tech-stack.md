@@ -3,7 +3,7 @@
 ## 一、选型总表
 
 | 层次 | 推荐 | 备选 | 选择理由 |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | 入门 SDK | **Vercel AI SDK**（`ai` + `@ai-sdk/react`） | LangChain.js | API 设计对前端最友好，`useChat` / 流式 / RSC 开箱即用，工具结果可直接渲染成 React 组件 |
 | 复杂编排 | LangGraph.js | Mastra / VoltAgent | 需要条件边、状态机、`interrupt`（人在回路）时再上 |
 | 原理学习 | 裸 `fetch` 调 OpenAI 兼容接口 | — | 零依赖，最能看清协议本身 |
