@@ -64,7 +64,7 @@ while (true) {
   for (const call of msg.tool_calls) {          // 有 → 逐个执行
     const args = JSON.parse(call.function.arguments);
     const result = await toolsMap[call.function.name](args);
-    messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) });
+    messages.push({ role: 'tool', tool_call_id': call.id, content: JSON.stringify(result) });
   }
 }
 
