@@ -1,0 +1,47 @@
+──── Demo 0 · 手写最小 Agent ────
+模型：deepseek-chat  接口：https://api.deepseek.com/v1  步数上限：6
+用户：拉萨今天多少度
+
+[LLM 1179ms · 397 tokens]
+→ 请求调用工具：get_weather({"city": "拉萨"})
+
+← 工具返回 get_weather (214ms)
+   {"error":"没有找到「拉萨」的天气数据，目前只支持：北京、上海、广州、深圳"}
+
+[LLM 703ms · 466 tokens]
+思考/回答：抱歉，目前天气数据只支持北京、上海、广州、深圳，查不到拉萨的天气。你可以换个城市，或用其他天气应用查看拉萨的情况。
+
+最终回答：抱歉，目前天气数据只支持北京、上海、广州、深圳，查不到拉萨的天气。你可以换个城市，或用其他天气应用查看拉萨的情况。
+
+──── 统计 ────
+LLM 请求：2 次   工具调用：1 次   总 token：863   LLM 耗时：1882ms
+
+──── messages 数组全貌（这就是 Agent 的全部记忆）────
+[
+  {
+    role: 'system',
+    content: '你是一个简洁、可靠的助手。\n如果问题需要实时或外部数据，必须调用工具，不要凭记忆编造。\n拿到工具结果后用自然语言回答，控制在三句话以内。'
+  },
+  { role: 'user', content: '拉萨今天多少度' },
+  {
+    role: 'assistant',
+    content: '',
+    tool_calls: [
+      {
+        index: 0,
+        id: 'call_00_7aOlrnGarpXigLTQRgAr8191',
+        type: 'function',
+        function: { name: 'get_weather', arguments: '{"city": "拉萨"}' }
+      }
+    ]
+  },
+  {
+    role: 'tool',
+    tool_call_id: 'call_00_7aOlrnGarpXigLTQRgAr8191',
+    content: '{"error":"没有找到「拉萨」的天气数据，目前只支持：北京、上海、广州、深圳"}'
+  },
+  {
+    role: 'assistant',
+    content: '抱歉，目前天气数据只支持北京、上海、广州、深圳，查不到拉萨的天气。你可以换个城市，或用其他天气应用查看拉萨的情况。'
+  }
+]

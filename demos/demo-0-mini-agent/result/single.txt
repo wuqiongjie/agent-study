@@ -1,0 +1,47 @@
+──── Demo 0 · 手写最小 Agent ────
+模型：deepseek-chat  接口：https://api.deepseek.com/v1  步数上限：6
+用户：北京今天热吗
+
+[LLM 942ms · 397 tokens]
+→ 请求调用工具：get_weather({"city": "北京"})
+
+← 工具返回 get_weather (214ms)
+   {"city":"北京","weather":"晴","temperature":31,"humidity":38,"wind":"东南风 2 级"}
+
+[LLM 922ms · 467 tokens]
+思考/回答：北京今天晴，气温31℃，湿度38%，东南风2级，算是比较热的。出门建议穿轻薄透气的衣服，注意防晒补水。
+
+最终回答：北京今天晴，气温31℃，湿度38%，东南风2级，算是比较热的。出门建议穿轻薄透气的衣服，注意防晒补水。
+
+──── 统计 ────
+LLM 请求：2 次   工具调用：1 次   总 token：864   LLM 耗时：1864ms
+
+──── messages 数组全貌（这就是 Agent 的全部记忆）────
+[
+  {
+    role: 'system',
+    content: '你是一个简洁、可靠的助手。\n如果问题需要实时或外部数据，必须调用工具，不要凭记忆编造。\n拿到工具结果后用自然语言回答，控制在三句话以内。'
+  },
+  { role: 'user', content: '北京今天热吗' },
+  {
+    role: 'assistant',
+    content: '',
+    tool_calls: [
+      {
+        index: 0,
+        id: 'call_00_RDLTalbd8fj9bmkVnG7Z4593',
+        type: 'function',
+        function: { name: 'get_weather', arguments: '{"city": "北京"}' }
+      }
+    ]
+  },
+  {
+    role: 'tool',
+    tool_call_id: 'call_00_RDLTalbd8fj9bmkVnG7Z4593',
+    content: '{"city":"北京","weather":"晴","temperature":31,"humidity":38,"wind":"东南风 2 级"}'
+  },
+  {
+    role: 'assistant',
+    content: '北京今天晴，气温31℃，湿度38%，东南风2级，算是比较热的。出门建议穿轻薄透气的衣服，注意防晒补水。'
+  }
+]

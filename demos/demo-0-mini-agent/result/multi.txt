@@ -1,0 +1,62 @@
+──── Demo 0 · 手写最小 Agent ────
+模型：deepseek-chat  接口：https://api.deepseek.com/v1  步数上限：6
+用户：上海和北京今天的天气怎么样，帮我对比一下
+
+[LLM 1104ms · 432 tokens]
+→ 请求调用工具：get_weather({"city": "上海"})
+→ 请求调用工具：get_weather({"city": "北京"})
+
+← 工具返回 get_weather (212ms)
+   {"city":"上海","weather":"多云","temperature":27,"humidity":72,"wind":"东风 3 级"}
+
+← 工具返回 get_weather (201ms)
+   {"city":"北京","weather":"晴","temperature":31,"humidity":38,"wind":"东南风 2 级"}
+
+[LLM 1050ms · 551 tokens]
+思考/回答：上海今天多云，27℃，湿度72%，东风3级；北京晴，31℃，湿度38%，东南风2级。北京更热更干，上海偏闷湿，体感上上海黏、北京晒。
+
+最终回答：上海今天多云，27℃，湿度72%，东风3级；北京晴，31℃，湿度38%，东南风2级。北京更热更干，上海偏闷湿，体感上上海黏、北京晒。
+
+──── 统计 ────
+LLM 请求：2 次   工具调用：2 次   总 token：983   LLM 耗时：2154ms
+
+──── messages 数组全貌（这就是 Agent 的全部记忆）────
+[
+  {
+    role: 'system',
+    content: '你是一个简洁、可靠的助手。\n如果问题需要实时或外部数据，必须调用工具，不要凭记忆编造。\n拿到工具结果后用自然语言回答，控制在三句话以内。'
+  },
+  { role: 'user', content: '上海和北京今天的天气怎么样，帮我对比一下' },
+  {
+    role: 'assistant',
+    content: '',
+    tool_calls: [
+      {
+        index: 0,
+        id: 'call_00_oG4OeupbCXm4rG3Ov02y7605',
+        type: 'function',
+        function: { name: 'get_weather', arguments: '{"city": "上海"}' }
+      },
+      {
+        index: 1,
+        id: 'call_01_2EYtiVH1L8TqauEb7Q6F5737',
+        type: 'function',
+        function: { name: 'get_weather', arguments: '{"city": "北京"}' }
+      }
+    ]
+  },
+  {
+    role: 'tool',
+    tool_call_id: 'call_00_oG4OeupbCXm4rG3Ov02y7605',
+    content: '{"city":"上海","weather":"多云","temperature":27,"humidity":72,"wind":"东风 3 级"}'
+  },
+  {
+    role: 'tool',
+    tool_call_id: 'call_01_2EYtiVH1L8TqauEb7Q6F5737',
+    content: '{"city":"北京","weather":"晴","temperature":31,"humidity":38,"wind":"东南风 2 级"}'
+  },
+  {
+    role: 'assistant',
+    content: '上海今天多云，27℃，湿度72%，东风3级；北京晴，31℃，湿度38%，东南风2级。北京更热更干，上海偏闷湿，体感上上海黏、北京晒。'
+  }
+]

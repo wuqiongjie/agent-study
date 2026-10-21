@@ -1,0 +1,44 @@
+──── Demo 0 · 手写最小 Agent ────
+模型：deepseek-chat  接口：https://api.deepseek.com/v1  步数上限：6
+用户：北京今天几点
+
+[LLM 825ms · 412 tokens]
+→ 请求调用工具：get_time({})
+
+← 工具返回 get_time (20ms)
+   "2026/10/21 20:10:08"
+
+[LLM 758ms · 450 tokens]
+思考/回答：现在是2026年10月21日20点10分。
+
+最终回答：现在是2026年10月21日20点10分。
+
+──── 统计 ────
+LLM 请求：2 次   工具调用：1 次   总 token：862   LLM 耗时：1583ms
+
+──── messages 数组全貌（这就是 Agent 的全部记忆）────
+[
+  {
+    role: 'system',
+    content: '你是一个简洁、可靠的助手。\n如果问题需要实时或外部数据，必须调用工具，不要凭记忆编造。\n拿到工具结果后用自然语言回答，控制在三句话以内。'
+  },
+  { role: 'user', content: '北京今天几点' },
+  {
+    role: 'assistant',
+    content: '',
+    tool_calls: [
+      {
+        index: 0,
+        id: 'call_00_1Suz2I90RzXEj3qFcLkQ2632',
+        type: 'function',
+        function: { name: 'get_time', arguments: '{}' }
+      }
+    ]
+  },
+  {
+    role: 'tool',
+    tool_call_id: 'call_00_1Suz2I90RzXEj3qFcLkQ2632',
+    content: '"2026/10/21 20:10:08"'
+  },
+  { role: 'assistant', content: '现在是2026年10月21日20点10分。' }
+]
