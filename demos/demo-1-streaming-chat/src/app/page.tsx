@@ -52,7 +52,6 @@ function ToolCard({ part }: { part: ToolPart }) {
 }
 
 export default function ChatPage() {
-  const [initialMessages] = useState<UIMessage[]>(readStored);
   const [input, setInput] = useState('');
   const [firstByteMs, setFirstByteMs] = useState<number | null>(null);
   const sentAt = useRef<number | null>(null);
@@ -60,13 +59,24 @@ export default function ChatPage() {
 
   const { messages, sendMessage, setMessages, status, error, stop, regenerate, clearError } = useChat({
     id: 'demo-1-chat',
-    messages: initialMessages,
   });
 
   const busy = status === 'submitted' || status === 'streaming';
 
-  // 持久化：刷新后从 localStorage 恢复
+  // 挂载后再从 localStorage 恢复历史消息：
+  // 服务端渲染时一律为空，否则服务端 HTML 与客户端首帧不一致会触发 hydration mismatch
   useEffect(() => {
+    const stored = readStored();
+    if (stored.length > 0) {
+      setMessages(stored);
+    }
+    // 只在挂载时执行一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 持久化：只在有消息时写入，避免挂载首帧用空数组覆盖历史
+  useEffect(() => {
+    if (messages.length === 0) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
     } catch {

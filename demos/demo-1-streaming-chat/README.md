@@ -26,22 +26,33 @@ Demo 0 里我们手写了 `while` 循环。这一步换上 **Vercel AI SDK**，�
 | `next` | 16（App Router + TS + Tailwind v4） | 页面与 API 路由 |
 | `ai` | ^6（AI SDK v6） | `streamText` / `tool` / `stepCountIs` |
 | `@ai-sdk/react` | ^3 | `useChat` |
-| `@ai-sdk/openai` | ^3 | 官方 OpenAI provider |
+| `@ai-sdk/openai` | ^3 | OpenAI 兼容 provider（当前接 **DeepSeek**） |
 | `zod` | ^4 | 工具参数 schema |
 
 ```powershell
 cd demos/demo-1-streaming-chat
 
-# 1. 配置密钥（官方 OpenAI）
+# 1. 配置密钥（默认 DeepSeek）
 Copy-Item .env.example .env.local
-# 编辑 .env.local，填入 OPENAI_API_KEY
+# 编辑 .env.local，填入 OPENAI_API_KEY（DeepSeek 的 key）
 
 # 2. 起服务
 npm run dev     # http://localhost:3000
 ```
 
-> 若改用 OpenAI 兼容接口，把 route.ts 里的 provider 换成 `createOpenAI({ baseURL })` 即可，
-> 与 Demo 0 的 `OPENAI_BASE_URL` 玩法一致。
+模型接入方式：DeepSeek 是 **OpenAI 兼容接口**，用 `createOpenAI({ baseURL })` 接即可，
+默认 `https://api.deepseek.com/v1`、模型 `deepseek-chat`。
+
+| 环境变量 | 默认 | 说明 |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | — | 必填，DeepSeek 密钥 |
+| `OPENAI_BASE_URL` | `https://api.deepseek.com/v1` | 换其他兼容厂商时改这个 |
+| `MODEL_NAME` | `deepseek-chat` | 必须是支持 function calling 的模型 |
+
+> 想换成别的 OpenAI 兼容厂商（通义千问、智谱 GLM 等），只改 `OPENAI_BASE_URL` + `MODEL_NAME`，代码不用动 —— 与 Demo 0 的玩法一致。
+
+已实测：`deepseek-chat` 走 `.chat()`（Chat Completions 兼容）模式，工具调用链路通 ——
+`tool-input-start` → `tool-input-available` → `tool-output-available`，模型拿到结果后再总结。
 
 ## 三、代码文件
 
@@ -59,8 +70,15 @@ npm run dev     # http://localhost:3000
 `src/app/api/chat/route.ts` 要点：
 
 ```ts
+// DeepSeek 是 OpenAI 兼容接口，用兼容 provider 接即可
+const provider = createOpenAI({
+  baseURL: process.env.OPENAI_BASE_URL ?? 'https://api.deepseek.com/v1',
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const model = provider(process.env.MODEL_NAME ?? 'deepseek-chat');
+
 const result = streamText({
-  model: openai('gpt-4o-mini'),
+  model,
   system: '你是简洁可靠的助手。需要实时数据时必须调用工具，不要编造。',
   messages: await convertToModelMessages(messages), // v6 起该转换是异步的
   stopWhen: stepCountIs(6),                          // ← 对应 Demo 0 的 maxSteps 护栏
@@ -121,6 +139,7 @@ return result.toUIMessageStreamResponse();
 | 现象 | 原因与处理 |
 | --- | --- |
 | 流里只有 `{"type":"error","errorText":"An error occurred."}` | 没配 `OPENAI_API_KEY` 或密钥无效；SDK 默认隐藏服务端错误详情 |
+| 模型完全不调工具 | 检查 `MODEL_NAME`：`deepseek-reasoner` **不支持**工具调用，用 `deepseek-chat` |
 | `useChat` 报 404 | 默认打 `/api/chat`，确认路由文件路径正确 |
 | 流式变成一次性返回 | 路由里忘了 `toUIMessageStreamResponse()`，或用了 `generateText` |
 | `convertToModelMessages` 类型报错 | v6 起返回 Promise，记得 `await` |

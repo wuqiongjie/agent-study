@@ -1,9 +1,20 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { convertToModelMessages, stepCountIs, streamText, tool, type UIMessage } from 'ai';
 import { z } from 'zod';
 
 // 允许流式最长 30 秒
 export const maxDuration = 30;
+
+// DeepSeek 提供 OpenAI 兼容接口，直接用兼容 provider 接入即可
+// 命名沿用 Demo 0：OPENAI_API_KEY / OPENAI_BASE_URL / MODEL_NAME
+const provider = createOpenAI({
+  baseURL: process.env.OPENAI_BASE_URL ?? 'https://api.deepseek.com/v1',
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// 用 .chat() 走 Chat Completions 兼容模式：DeepSeek 的 Responses 兼容层不触发工具调用
+// deepseek-chat 支持 function calling；deepseek-reasoner 不支持
+const model = provider.chat(process.env.MODEL_NAME ?? 'deepseek-chat');
 
 // 假数据：与 Demo 0 保持一致，把注意力放在链路上，而不是外部 API
 const MOCK_DB: Record<string, { city: string; weather: string; temperature: number; humidity: number; wind: string }> = {
@@ -17,7 +28,7 @@ export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model,
     system: `你是一个简洁、可靠的助手。
 如果问题需要实时或外部数据，必须调用工具，不要凭记忆编造。
 拿到工具结果后用自然语言回答，控制在三句话以内。`,
