@@ -62,6 +62,9 @@ npm run dev     # http://localhost:3000
 | `src/app/page.tsx` | 客户端：`useChat` 打字机 + 工具调用折叠卡片 + 错误提示 |
 | `src/app/layout.tsx` | 页面标题（已从 CNA 模板改为本项目） |
 | `.env.example` | 密钥示例（`.env.local` 不入库） |
+| `FLOW.md` | **询问-回答完整流程图**：端到端时序图 + 服务端循环决策 + SSE 事件对照 |
+
+完整链路图见 [FLOW.md](FLOW.md)（时序图 + 循环决策图 + 事件对照表）。
 
 ## 四、分步任务（代码已写好，按这个顺序对照看）
 
