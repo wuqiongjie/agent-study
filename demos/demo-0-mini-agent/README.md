@@ -1,5 +1,7 @@
 # Demo 0 · 手写最小 Agent（零框架）
 
+> 状态：✅ 已学完（2026-10-21）　下一步：进入 Demo 1
+
 不用 LangChain、不用 Vercel AI SDK，只用 Node 内置 `fetch` 直接调 OpenAI 兼容接口，
 手写一个完整的 Agent 循环。**目的是看清协议本身**，之后再学任何框架都不会发虚。
 
@@ -24,7 +26,7 @@ npm start
 
 `npm start` 默认问「北京今天热吗？根据天气给个穿衣建议」。
 
-### 四个演示场景
+### 五个演示场景
 
 | 命令 | 看什么 |
 | --- | --- |
@@ -32,6 +34,9 @@ npm start
 | `npm run demo:multi` | 多步：同一个问题触发两次工具调用 |
 | `npm run demo:miss` | 工具报错 → 错误信息回传 → 模型自己纠错 |
 | `npm run demo:notool` | 不触发工具：直接回答，循环第一轮就结束 |
+| `npm run demo:currenttime` | 无参工具：模型也能正确调用 `get_time`（参数为空对象） |
+
+各场景的真实输出记录在 `result/` 下（`single.txt`、`multi.txt`、`miss.txt`、`start.txt`、`notool`、`currenttime`）。
 
 自定义问题与步数上限：
 
@@ -48,6 +53,7 @@ node src/index.js "深圳和广州今天哪里更适合户外跑步" --steps=8
 | `src/llm.js` | 唯一的模型请求出口，拼装 `tools` 与 `tool_choice` |
 | `src/tools.js` | 工具的「说明书」（JSON Schema）+ 本地实现 |
 | `src/env.js` | 极简 `.env` 加载（不引入 dotenv，保持零依赖） |
+| `result/` | 各演示场景的运行输出，方便不看代码也能回看报文流转 |
 
 ## 三、报文流转（对着代码看一次就够了）
 
@@ -75,18 +81,18 @@ node src/index.js "深圳和广州今天哪里更适合户外跑步" --steps=8
 
 ## 五、验收清单
 
-对照跑一遍，全勾上再进 Demo 1：
+对照跑一遍，全勾上再进 Demo 1（全部已于 2026-10-21 通过）：
 
-- [ ] 能看懂上面 ①~⑤ 的报文流转
-- [ ] 跑通 `demo:single`，看得懂终端每一步输出
-- [ ] 跑通 `demo:multi`，观察到一次任务里出现**两次**工具调用
-- [ ] 跑通 `demo:miss`，看到模型拿到错误信息后**自己换了个说法**
-- [ ] 跑通 `demo:notool`，确认循环第一轮就结束
-- [ ] 在不看参考的前提下，手写出 `agent.js` 里的 `while` 循环
-- [ ] 能解释：`tool_choice: 'auto'` 与 `'none'` 的区别
-- [ ] 自己加一个新工具（下面有提示）
+- [x] 能看懂上面 ①~⑤ 的报文流转
+- [x] 跑通 `demo:single`，看得懂终端每一步输出
+- [x] 跑通 `demo:multi`，观察到一次任务里出现**两次**工具调用
+- [x] 跑通 `demo:miss`，看到模型拿到错误信息后**自己换了个说法**
+- [x] 跑通 `demo:notool`，确认循环第一轮就结束
+- [x] 在不看参考的前提下，手写出 `agent.js` 里的 `while` 循环
+- [x] 能解释：`tool_choice: 'auto'` 与 `'none'` 的区别
+- [x] 自己加一个新工具 → 已加 `get_time`，见第六节
 
-## 六、扩展一个新工具
+## 六、扩展一个新工具（已实操：get_time）
 
 只改 `src/tools.js`，两处都要动，名字保持一致：
 
@@ -97,7 +103,7 @@ export const toolDefs = [
     type: 'function',
     function: {
       name: 'get_time',
-      description: '获取当前时间。当用户询问现在几点、今天日期时使用。',
+      description: '获取当前时间',
       parameters: { type: 'object', properties: {}, required: [] },
     },
   },
@@ -106,10 +112,20 @@ export const toolDefs = [
 export const toolImpls = {
   // ... 已有实现
   async get_time() {
-    return { now: new Date().toLocaleString('zh-CN') };
+    return new Date().toLocaleString();
   },
 };
 ```
+
+配套在 `package.json` 里加了 `demo:currenttime`，跑 `npm run demo:currenttime` 验证。
+
+**本次实操的三个收获：**
+
+1. 无参工具也要给 `parameters`（空 `properties` + 空 `required`），否则部分模型会报 schema 非法；
+2. 工具返回的是字符串还是对象都能用，关键是 `role: 'tool'` 消息的 `content` 必须是字符串，
+   对象会在 `agent.js` 里被 `JSON.stringify`；
+3. description 里没写「当用户询问现在几点时调用」，但模型依然正确触发 —— 说明简单工具描述门槛不高；
+   反过来印证：真正决定成败的是**边界与时机**写清楚的工具（如 `get_weather` 的「一次只能查一个城市」）。
 
 **练写 `description` 比练写 prompt 更重要** —— 试着把 `get_weather` 的 description 改差（比如只写「查天气」），
 再跑一次，你会直观看到工具调用成功率下降。
