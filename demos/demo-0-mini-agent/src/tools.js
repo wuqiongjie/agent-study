@@ -26,6 +26,18 @@ export const toolDefs = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'get_time',
+      description: '获取当前时间',
+      parameters: {
+        type: 'object',
+        properties: {},
+        required: [],
+      }
+    }
+  }
 ];
 
 // 假数据：本 demo 不请求真实天气 API，避免增加依赖与密钥
@@ -50,6 +62,10 @@ export const toolImpls = {
     }
     return record;
   },
+
+  async get_time() {
+    return new Date().toLocaleString()
+  }
 };
 
 /**
