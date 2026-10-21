@@ -4,7 +4,7 @@
 
 ---
 
-## Demo 0 · 手写最小 Agent（必做）
+## Demo 0 · 手写最小 Agent（必做）✅ 已完成 2026-10-21
 
 - **形态**：Node CLI，**不使用任何框架**
 - **工具**：`get_weather(city)`（可先用假数据返回）
@@ -18,7 +18,7 @@
 
 ---
 
-## Demo 1 · Next.js 流式聊天界面
+## Demo 1 · Next.js 流式聊天界面 🟡 进行中（2026-10-21 开始）
 
 - **形态**：Next.js App Router + Vercel AI SDK
 - **功能**：
@@ -95,8 +95,8 @@
 
 | # | Demo | 状态 |
 | --- | --- | --- |
-| 0 | 手写最小 Agent | ⬜ |
-| 1 | Next.js 流式聊天 | ⬜ |
+| 0 | 手写最小 Agent | ✅ 2026-10-21 |
+| 1 | Next.js 流式聊天 | 🟡 进行中 |
 | 2 | ReAct 调研助手 | ⬜ |
 | 3 | 人在回路 | ⬜ |
 | 4 | Generative UI | ⬜ |
