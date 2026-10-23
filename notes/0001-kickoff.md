@@ -17,6 +17,6 @@
 
 ## 下一步
 
-- [ ] 完成 Demo 0：裸 API 手写最小 Agent（`docs/03-demo-ladder.md`）
-- [ ] 完成 Demo 1：Next.js + Vercel AI SDK 流式聊天界面
+- [x] 完成 Demo 0：裸 API 手写最小 Agent（`docs/03-demo-ladder.md`）✅ 2026-10-21
+- [x] 完成 Demo 1：Next.js + Vercel AI SDK 流式聊天界面 ✅ 2026-10-23
 - [ ] 为仓库接入 trace 工具（Langfuse 或自建日志），从第一个 demo 就记录报文

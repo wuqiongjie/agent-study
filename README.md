@@ -43,16 +43,20 @@ LLM 推理（携带 tools 描述）
 │   ├── 02-tech-stack.md      # 技术选型对照表
 │   ├── 03-demo-ladder.md     # 6 个 demo 的阶梯与验收标准
 │   └── 04-frontend-edge.md   # 前端工程师的差异化能力
+├── demos/
+│   ├── demo-0-mini-agent/     # ✅ 手写最小 Agent（零框架，已完成）
+│   └── demo-1-streaming-chat/ # ✅ Next.js 流式聊天 + 工具可视化（已完成）
 ├── notes/
 │   ├── TEMPLATE.md           # 单条学习记录模板
-│   └── 0001-kickoff.md       # 第 1 条记录：立项
+│   ├── 0001-kickoff.md       # 第 1 条记录：立项
+│   └── 0002-demo1-streaming.md # 第 2 条记录：Demo 1
 └── .gitignore
 ```
 
 ## 使用方式
 
 1. 每完成一个 demo，在 `notes/` 下新建 `000X-主题.md`（命名沿用 `TEMPLATE.md`）。
-2. demo 代码统一放在 `demos/demo-0X-xxx/`（尚未创建，完成后补充）。
+2. demo 代码统一放在 `demos/demo-0X-xxx/`（已完成 `demo-0-mini-agent`、`demo-1-streaming-chat`）。
 3. `README.md` 中的路线表随进度更新，打勾表示已完成并附链接。
 
 ## 三条实践纪律
